@@ -1,0 +1,9 @@
+[flake8]
+exclude = .git,__pycache__,temp,old,build,dist,env,venv
+max_complexity = 18
+per_file_ignores = __init__.py: F401 # imported but unused
+max_line_length = 100
+max_doc_length = 100
+statistics = True
+show_source = True
+count = True
