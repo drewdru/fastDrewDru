@@ -11,6 +11,7 @@ class MovieIn(BaseModel):
 class MovieOut(MovieIn):
     id: int
 
+
 class MovieUpdate(MovieIn):
     name: Optional[str] = None
     plot: Optional[str] = None
