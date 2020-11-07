@@ -20,11 +20,13 @@ def cli():
 def initapp(microservice_name):
     try:
         Path(microservice_name).mkdir()
+        with open(f"{microservice_name}/__init__.py", "w") as io_file:
+            io_file.write("# Init your app.\n")
         with open(f"{microservice_name}/crud.py", "w") as io_file:
             io_file.write("# Create your CRUD methods here.\n")
         with open(f"{microservice_name}/schemas.py", "w") as io_file:
             io_file.write("# Create your pydantic schemas here.\n")
-        with open(f"{microservice_name}/schemas.py", "w") as io_file:
+        with open(f"{microservice_name}/views.py", "w") as io_file:
             io_file.write("# Create your endpoints here.\n")
         Path(f"{microservice_name}/models").mkdir()
         with open(f"{microservice_name}/models/__init__.py", "w") as io_file:

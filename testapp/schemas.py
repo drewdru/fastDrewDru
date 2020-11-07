@@ -1,1 +1,1 @@
-# Create your endpoints here.
+# Create your pydantic schemas here.

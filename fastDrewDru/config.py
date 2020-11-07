@@ -7,6 +7,7 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str
     APPS: List[str] = ["testapp", "helloworld", "movies"]
+    SENTRY_DNS: str
 
     class Config:
         env_file = ".env"
