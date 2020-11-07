@@ -2,14 +2,13 @@ from typing import Optional
 
 from fastapi import APIRouter, Body, Path, Query
 
-from helloworld.models import Item
+from helloworld.schemas import Item
 
 helloworld = APIRouter()
 
 
 @helloworld.get(
     "/",
-    tags=["main"],
     responses={
         200: {
             "description": "Return Hello World.",
@@ -23,7 +22,6 @@ async def read_root() -> dict:
 
 @helloworld.get(
     "/items/{item_id}",
-    tags=["main"],
     responses={
         200: {
             "description": "Item Data.",
@@ -44,7 +42,6 @@ async def read_item(
 
 @helloworld.put(
     "/items/{item_id}",
-    tags=["main"],
     status_code=201,
     responses={
         201: {

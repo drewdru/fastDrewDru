@@ -1,22 +1,22 @@
-from sqlalchemy import (Column, Integer, MetaData, String, Table,
-                        create_engine, ARRAY)
+from functools import lru_cache
+from typing import Tuple
 
 from databases import Database
-from . import config
+from sqlalchemy import MetaData, create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
-settings = config.get_settings()
+from fastDrewDru import config
 
-engine = create_engine(settings.DATABASE_URL)
-metadata = MetaData()
 
-movies = Table(
-    'movies',
-    metadata,
-    Column('id', Integer, primary_key=True),
-    Column('name', String(50)),
-    Column('plot', String(250)),
-    Column('genres', ARRAY(String)),
-    Column('casts', ARRAY(String))
-)
+@lru_cache()
+def get_db() -> Tuple[Database, MetaData, Engine, DeclarativeMeta]:
+    settings = config.get_settings()
+    engine = create_engine(settings.SQLALCHEMY_DATABASE_URI)
+    metadata = MetaData()
+    db = Database(settings.SQLALCHEMY_DATABASE_URI)
+    Base = declarative_base(bind=engine, metadata=metadata)
+    return db, metadata, engine, Base
 
-database = Database(settings.DATABASE_URL)
+
+db, metadata, engine, Base = get_db()

@@ -2,28 +2,26 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 
-from movies import db_manager
-from movies.models import MovieIn, MovieOut
+from movies import crud
+from movies.schemas import MovieIn, MovieOut
 
 movies = APIRouter()
 
 
 @movies.get("/", response_model=List[MovieOut])
 async def index():
-    return await db_manager.get_all_movies()
+    return await crud.get_all_movies()
 
 
 @movies.post("/", status_code=201)
 async def add_movie(payload: MovieIn):
-    movie_id = await db_manager.add_movie(payload)
-    response = {"id": movie_id, **payload.dict()}
-
-    return response
+    movie_id = await crud.add_movie(payload)
+    return {"id": movie_id, **payload.dict()}
 
 
 @movies.put("/{id}")
 async def update_movie(id: int, payload: MovieIn):
-    movie = await db_manager.get_movie(id)
+    movie = await crud.get_movie(id)
     if not movie:
         raise HTTPException(status_code=404, detail="Movie not found")
 
@@ -32,12 +30,12 @@ async def update_movie(id: int, payload: MovieIn):
 
     updated_movie = movie_in_db.copy(update=update_data)
 
-    return await db_manager.update_movie(id, updated_movie)
+    return await crud.update_movie(id, updated_movie)
 
 
 @movies.delete("/{id}")
 async def delete_movie(id: int):
-    movie = await db_manager.get_movie(id)
+    movie = await crud.get_movie(id)
     if not movie:
         raise HTTPException(status_code=404, detail="Movie not found")
-    return await db_manager.delete_movie(id)
+    return await crud.delete_movie(id)
