@@ -5,8 +5,9 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    SQLALCHEMY_DATABASE_URI: str
+    DEBUG: bool = True
     APPS: List[str] = ["testapp", "helloworld", "movies"]
+    SQLALCHEMY_DATABASE_URI: str
     SENTRY_DNS: str
 
     class Config:
