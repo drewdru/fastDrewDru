@@ -1,4 +1,7 @@
 import logging
+import logging.config
+import os
+import sys
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +12,8 @@ from helloworld.views import helloworld
 from middlewares import SentryMiddleware
 from movies.views import movies
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
 logging.config.fileConfig("logging.conf", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 settings = config.get_settings()
