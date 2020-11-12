@@ -83,9 +83,9 @@ def migrations(ctx: click.Context, prod: bool, *args, **kwargs) -> None:
 @click.command()
 @click.option("--prod/--no-prod", default=False)
 def run(prod: bool) -> None:
-    env_file = f".env"
+    env_file = ".env"
     if prod:
-        env_file = f".env.prod"
+        env_file = f"{env_file}.prod"
 
     load_dotenv(os.path.join(BASE_DIR, env_file))
     settings = config.get_settings()
