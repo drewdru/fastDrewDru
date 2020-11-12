@@ -3,11 +3,13 @@ from pathlib import Path
 
 import click
 import massedit
+import uvicorn
+from dotenv import load_dotenv
 
-from fastDrewDru.config import get_settings
+from fastDrewDru import config
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 project_name = "fastDrewDru"
-settings = get_settings()
 
 
 @click.group()
@@ -17,7 +19,8 @@ def cli():
 
 @click.command()
 @click.argument("microservice_name")
-def initapp(microservice_name):
+@click.option("--prod/--no-prod", default=False)
+def initapp(microservice_name, prod):
     try:
         Path(microservice_name).mkdir()
         with open(f"{microservice_name}/__init__.py", "w") as io_file:
@@ -28,6 +31,8 @@ def initapp(microservice_name):
             io_file.write("# Create your pydantic schemas here.\n")
         with open(f"{microservice_name}/views.py", "w") as io_file:
             io_file.write("# Create your endpoints here.\n")
+        with open(f"{microservice_name}/tests.py", "w") as io_file:
+            io_file.write("# Create your tests here.\n")
         Path(f"{microservice_name}/models").mkdir()
         with open(f"{microservice_name}/models/__init__.py", "w") as io_file:
             io_file.write(
@@ -54,15 +59,59 @@ def initapp(microservice_name):
     context_settings=dict(
         ignore_unknown_options=True,
         allow_extra_args=True,
+        allow_interspersed_args=True,
     )
 )
 @click.pass_context
-def migrations(ctx: click.Context, *args, **kwargs) -> None:
-    os.system(f'alembic {" ".join(ctx.args)}')
+@click.option("--prod/--no-prod", default=False)
+def migrations(ctx: click.Context, prod: bool, *args, **kwargs) -> None:
+    alembic_command = "alembic"
+    if prod:
+        alembic_command = "ENV=prod alembic"
+
+    is_need_quotes = False
+    for arg in ctx.args:
+        if is_need_quotes:
+            alembic_command = f'{alembic_command} "{arg}"'
+            is_need_quotes = False
+        else:
+            alembic_command = f"{alembic_command} {arg}"
+            if arg == "-m":
+                is_need_quotes = True
+    os.system(alembic_command)
+
+
+@click.command()
+@click.option("--prod/--no-prod", default=False)
+def run(prod: bool) -> None:
+    env_file = f".env"
+    if prod:
+        env_file = f".env.prod"
+
+    load_dotenv(os.path.join(BASE_DIR, env_file))
+    settings = config.get_settings()
+    if prod:
+        uvicorn.run(
+            "main:app",
+            host=settings.HOST,
+            port=settings.PORT,
+            debug=settings.DEBUG,
+            reload=True,
+            env_file=env_file,
+        )
+    else:
+        uvicorn.run(
+            "main:app",
+            host=settings.HOST,
+            port=settings.PORT,
+            debug=settings.DEBUG,
+            env_file=env_file,
+        )
 
 
 cli.add_command(initapp)
 cli.add_command(migrations)
+cli.add_command(run)
 
 if __name__ == "__main__":
     cli()

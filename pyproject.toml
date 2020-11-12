@@ -8,6 +8,7 @@ exclude = '''
   | \.tox
   | \.venv
   | \.env
+  | \.env.prod
   | env
   | venv
   | _build

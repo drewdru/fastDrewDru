@@ -1,15 +1,15 @@
-"""initial movies
+"""init migration
 
-Revision ID: 5cb2d8a90143
+Revision ID: e5bfe5187f4f
 Revises:
-Create Date: 2020-11-06 03:11:39.223589
+Create Date: 2020-11-11 21:25:22.797146
 
 """
 import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "5cb2d8a90143"
+revision = "e5bfe5187f4f"
 down_revision = None
 branch_labels = None
 depends_on = None

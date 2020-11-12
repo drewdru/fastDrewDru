@@ -7,10 +7,20 @@ from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load_dotenv(os.path.join(BASE_DIR, ".env"))
 sys.path.append(BASE_DIR)
 
-from fastDrewDru.db import metadata  # noqa
+from fastDrewDru import config as app_config  # noqa
+
+# imports after add BASE_DIR to sys.path
+from fastDrewDru.db import get_db_service  # noqa
+
+ENV = os.getenv("ENV", "dev")
+env_file = f".env"
+if ENV == "prod":
+    env_file = f".env.prod"
+
+load_dotenv(os.path.join(BASE_DIR, env_file))
+db_service = get_db_service()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -24,17 +34,14 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-# from movies.models import *
-from fastDrewDru.config import get_settings  # noqa
 
-settings = get_settings()
+settings = app_config.get_settings()
 for app in settings.APPS:
     try:
         exec(f"from {app}.models import *")
     except ModuleNotFoundError:
         continue
-
-target_metadata = metadata
+target_metadata = db_service.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

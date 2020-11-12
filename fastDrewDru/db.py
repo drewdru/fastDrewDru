@@ -1,22 +1,24 @@
+from dataclasses import dataclass
 from functools import lru_cache
-from typing import Tuple
 
 from databases import Database
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
 from fastDrewDru import config
 
 
+@dataclass
+class DbService:
+    db: Database
+    metadata: MetaData
+    engine: Engine
+
+
 @lru_cache()
-def get_db() -> Tuple[Database, MetaData, Engine, DeclarativeMeta]:
+def get_db_service() -> DbService:
     settings = config.get_settings()
     engine = create_engine(settings.SQLALCHEMY_DATABASE_URI)
     metadata = MetaData()
     db = Database(settings.SQLALCHEMY_DATABASE_URI)
-    Base = declarative_base(bind=engine, metadata=metadata)
-    return db, metadata, engine, Base
-
-
-db, metadata, engine, Base = get_db()
+    return DbService(db=db, metadata=metadata, engine=engine)

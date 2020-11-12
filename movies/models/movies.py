@@ -1,6 +1,10 @@
 from sqlalchemy import ARRAY, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
 
-from fastDrewDru.db import Base
+from fastDrewDru.db import get_db_service
+
+db_service = get_db_service()
+Base = declarative_base(bind=db_service.engine, metadata=db_service.metadata)
 
 
 class Movies(Base):
@@ -14,4 +18,4 @@ class Movies(Base):
     test = Column(String(150))
 
 
-movies = Movies.__table__
+movies_query = Movies.__table__
