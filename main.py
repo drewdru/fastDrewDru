@@ -61,3 +61,4 @@ app.add_middleware(SentryMiddleware, dns=settings.SENTRY_DNS, traces_sample_rate
 # Inittialize routers
 app.include_router(movies, prefix="/movies", tags=["movies"])
 app.include_router(helloworld, prefix="/helloworld", tags=["helloworld"])
+print(app.routes)

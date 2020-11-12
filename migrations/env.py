@@ -15,9 +15,9 @@ from fastDrewDru import config as app_config  # noqa
 from fastDrewDru.db import get_db_service  # noqa
 
 ENV = os.getenv("ENV", "dev")
-env_file = f".env"
+env_file = ".env"
 if ENV != "dev":
-    env_file = f".env.{ENV}"
+    env_file = f"{env_file}.{ENV}"
 
 load_dotenv(os.path.join(BASE_DIR, env_file))
 db_service = get_db_service()
