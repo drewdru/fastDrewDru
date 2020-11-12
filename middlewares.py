@@ -12,7 +12,7 @@ class SentryMiddleware(BaseHTTPMiddleware):
     def __init__(self, app=None, dns="", *args, **kwargs):
         super().__init__(app)
         sentry_logging = LoggingIntegration(
-            level=logging.INFO,  # Capture info and above as breadcrumbs
+            level=logging.WARNING,  # Capture info and above as breadcrumbs
             event_level=logging.ERROR,  # Send errors as events
         )
         kwargs["integrations"] = [sentry_logging]

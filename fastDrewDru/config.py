@@ -1,4 +1,5 @@
 import os
+import subprocess
 from functools import lru_cache
 from typing import List
 
@@ -33,6 +34,16 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
+
+    @property
+    def version(self):
+        branch = ""
+        if self.ENV == "prod":
+            branch = '"main"'
+        elif self.ENV == "dev":
+            branch = '"dev"'
+        tag = subprocess.getoutput(f"git describe --tags --abbrev=0 {branch}")
+        return tag.replace("v", "")
 
 
 class ProdSettings(Settings):

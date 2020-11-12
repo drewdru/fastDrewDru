@@ -3,8 +3,9 @@ import logging.config
 import os
 import sys
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from fastDrewDru import config
 from fastDrewDru.db import get_db_service
@@ -21,13 +22,17 @@ settings = config.get_settings()
 app = FastAPI(
     title="drewdru.com",
     description="REST API for drewdru.com",
-    version="0.1.0",
+    version=settings.version,
 )
 
 
-@app.get("/", tags=["home"])
-async def home():
-    return {"version": "0.1.0"}
+class IndexOut(BaseModel):
+    version: str
+
+
+@app.get("/", tags=["home"], status_code=status.HTTP_200_OK, response_model=IndexOut)
+async def index() -> Response:
+    return {"version": settings.version}
 
 
 @app.on_event("startup")
