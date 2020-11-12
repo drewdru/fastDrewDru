@@ -118,7 +118,7 @@ def run(prod: bool) -> None:
 @click.pass_context
 def test(ctx: click.Context, *args, **kwargs) -> None:
     ctx_args = " ".join(ctx.args)
-    os.system(f"ENV=test pytest {ctx_args}")
+    exit(os.system(f"ENV=test pytest {ctx_args}"))
 
 
 cli.add_command(initapp)
