@@ -19,7 +19,6 @@ def cli():
 
 @click.command()
 @click.argument("microservice_name")
-@click.option("--prod/--no-prod", default=False)
 def initapp(microservice_name, prod):
     try:
         Path(microservice_name).mkdir()
@@ -109,9 +108,23 @@ def run(prod: bool) -> None:
         )
 
 
+@click.command(
+    context_settings=dict(
+        ignore_unknown_options=True,
+        allow_extra_args=True,
+        allow_interspersed_args=True,
+    )
+)
+@click.pass_context
+def test(ctx: click.Context, *args, **kwargs) -> None:
+    ctx_args = " ".join(ctx.args)
+    os.system(f"ENV=test pytest {ctx_args}")
+
+
 cli.add_command(initapp)
 cli.add_command(migrations)
 cli.add_command(run)
+cli.add_command(test)
 
 if __name__ == "__main__":
     cli()

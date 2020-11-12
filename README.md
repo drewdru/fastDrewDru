@@ -3,21 +3,21 @@ backend for drewdru.com (https://github.com/drewdru/sitedrewdru)
 
 ## Manage progect
 ### Run project
-#### Dev
 ```bash
-python manage.py run
+python manage.py run [--prod]
 ```
-#### Prod
+### Run tests
 ```bash
-python manage.py run --prod
+python manage.py test
 ```
 ### Add new microservice
 ```bash
-python manage.py startapp microservice_name [--prod]
+python manage.py startapp microservice_name
 ```
 ### Run migrations commands
 ```bash
 python manage.py migrations -h [--prod]
+# Autogenerate migrations
 python manage.py migrations revision --autogenerate -m "Autogenerate migrations" [--prod]
 ```
 
