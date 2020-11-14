@@ -32,6 +32,7 @@ class IndexOut(BaseModel):
 
 @app.get("/", tags=["home"], status_code=status.HTTP_200_OK, response_model=IndexOut)
 async def index() -> Response:
+    print(app.routes)
     return {"version": settings.version}
 
 
@@ -61,4 +62,3 @@ app.add_middleware(SentryMiddleware, dns=settings.SENTRY_DNS, traces_sample_rate
 # Inittialize routers
 app.include_router(movies, prefix="/movies", tags=["movies"])
 app.include_router(helloworld, prefix="/helloworld", tags=["helloworld"])
-print(app.routes)

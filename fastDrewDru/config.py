@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     APPS: List[str] = ["testapp", "helloworld", "movies"]
     HOST: str
     PORT: int
-    SQLALCHEMY_DATABASE_URI: str = "sqlite:///test.db"
+    SQLALCHEMY_DATABASE_URI: str
     SENTRY_DNS: str
 
     CORS_ORIGIN_WHITELIST: List[str] = (

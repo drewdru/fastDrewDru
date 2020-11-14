@@ -1,4 +1,6 @@
 import os
+import subprocess
+import time
 from pathlib import Path
 
 import click
@@ -82,10 +84,10 @@ def migrations(ctx: click.Context, prod: bool, *args, **kwargs) -> None:
 
 @click.command()
 @click.option("--prod/--no-prod", default=False)
-def run(prod: bool) -> None:
+def run(prod: bool, test: bool) -> None:
     env_file = ".env"
     if prod:
-        env_file = f"{env_file}.prod"
+        env_file = ".env.prod"
 
     load_dotenv(os.path.join(BASE_DIR, env_file))
     settings = config.get_settings()
@@ -117,8 +119,32 @@ def run(prod: bool) -> None:
 )
 @click.pass_context
 def test(ctx: click.Context, *args, **kwargs) -> None:
+    os.system("ENV=test alembic upgrade head")
+
+    env_file = ".env.test"
+    os.environ["ENV"] = "test"
+    load_dotenv(os.path.join(BASE_DIR, env_file))
+    settings = config.get_settings()
+    main_process = subprocess.Popen(
+        [
+            "uvicorn",
+            "main:app",
+            "--host",
+            settings.HOST,
+            "--port",
+            str(settings.PORT),
+            "--env-file",
+            env_file,
+        ],
+        stdout=subprocess.PIPE,
+    )
+    time.sleep(5)
+
     ctx_args = " ".join(ctx.args)
-    exit(os.system(f"ENV=test pytest {ctx_args}"))
+    exit_status = os.system(f"ENV=test pytest {ctx_args}")
+    main_process.terminate()
+    os.system("ENV=test alembic downgrade base")
+    exit(exit_status)
 
 
 cli.add_command(initapp)
