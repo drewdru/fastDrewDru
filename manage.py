@@ -1,6 +1,4 @@
 import os
-import subprocess
-import time
 from pathlib import Path
 
 import click
@@ -42,16 +40,23 @@ def initapp(microservice_name, prod):
                 "import automodinit\n"
                 "automodinit.automodinit(__name__, __file__, globals())\n"
                 "del automodinit\n"
-                "# Anything else you want can go after here, it won't get modified.\n"
+                "# Anything else you want can go after here, "
+                "it won't get modified.\n"
             )
         with open(f"{microservice_name}/models/models.py", "w") as io_file:
             io_file.write("# Create your SqlAlchemy models here.\n")
 
-        add_app_to_settings = f"""re.sub(r'APPS: List\\[str] = \\[', 'APPS: List[str] = ["{
-            microservice_name
-        }",', line)"""
-        massedit.edit_files([f"./{project_name}/config.py"], [add_app_to_settings], dry_run=False)
-        print(f"""{microservice_name} has been created and APPS in "config.py" has been updated.""")
+        add_app_to_settings = (
+            "re.sub(r'APPS: List\\[str] = \\[',"
+            f"""'APPS: List[str] = ["{microservice_name}",', line)"""
+        )
+        massedit.edit_files(
+            [f"./{project_name}/config.py"], [add_app_to_settings], dry_run=False
+        )
+        print(
+            f'{microservice_name} has been created and APPS in "config.py"',
+            "has been updated.",
+        )
     except FileExistsError:
         print(f"{microservice_name} alredy exist")
 
@@ -84,7 +89,7 @@ def migrations(ctx: click.Context, prod: bool, *args, **kwargs) -> None:
 
 @click.command()
 @click.option("--prod/--no-prod", default=False)
-def run(prod: bool, test: bool) -> None:
+def run(prod: bool) -> None:
     env_file = ".env"
     if prod:
         env_file = ".env.prod"
@@ -120,29 +125,8 @@ def run(prod: bool, test: bool) -> None:
 @click.pass_context
 def test(ctx: click.Context, *args, **kwargs) -> None:
     os.system("ENV=test alembic upgrade head")
-
-    env_file = ".env.test"
-    os.environ["ENV"] = "test"
-    load_dotenv(os.path.join(BASE_DIR, env_file))
-    settings = config.get_settings()
-    main_process = subprocess.Popen(
-        [
-            "uvicorn",
-            "main:app",
-            "--host",
-            settings.HOST,
-            "--port",
-            str(settings.PORT),
-            "--env-file",
-            env_file,
-        ],
-        stdout=subprocess.PIPE,
-    )
-    time.sleep(5)
-
     ctx_args = " ".join(ctx.args)
     exit_status = os.system(f"ENV=test pytest {ctx_args}")
-    main_process.terminate()
     os.system("ENV=test alembic downgrade base")
     exit(exit_status)
 
