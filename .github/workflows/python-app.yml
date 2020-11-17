@@ -54,5 +54,6 @@ jobs:
         isort . --profile black
     - name: Test with pytest
       run: |
-        python manage.py test --ci
-        # ENV=ci pytest
+        #python manage.py test --ci
+        ENV=ci alembic upgrade head
+        ENV=ci pytest
