@@ -14,6 +14,25 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test
+          POSTGRES_USER: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
@@ -35,5 +54,6 @@ jobs:
         isort . --profile black
     - name: Test with pytest
       run: |
-        #python manage.py test
-        ENV=test pytest
+        #python manage.py test --ci
+        ENV=ci alembic upgrade head
+        ENV=ci pytest

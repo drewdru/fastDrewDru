@@ -40,16 +40,23 @@ def initapp(microservice_name, prod):
                 "import automodinit\n"
                 "automodinit.automodinit(__name__, __file__, globals())\n"
                 "del automodinit\n"
-                "# Anything else you want can go after here, it won't get modified.\n"
+                "# Anything else you want can go after here, "
+                "it won't get modified.\n"
             )
         with open(f"{microservice_name}/models/models.py", "w") as io_file:
             io_file.write("# Create your SqlAlchemy models here.\n")
 
-        add_app_to_settings = f"""re.sub(r'APPS: List\\[str] = \\[', 'APPS: List[str] = ["{
-            microservice_name
-        }",', line)"""
-        massedit.edit_files([f"./{project_name}/config.py"], [add_app_to_settings], dry_run=False)
-        print(f"""{microservice_name} has been created and APPS in "config.py" has been updated.""")
+        add_app_to_settings = (
+            "re.sub(r'APPS: List\\[str] = \\[',"
+            f"""'APPS: List[str] = ["{microservice_name}",', line)"""
+        )
+        massedit.edit_files(
+            [f"./{project_name}/config.py"], [add_app_to_settings], dry_run=False
+        )
+        print(
+            f'{microservice_name} has been created and APPS in "config.py"',
+            "has been updated.",
+        )
     except FileExistsError:
         print(f"{microservice_name} alredy exist")
 
@@ -85,7 +92,7 @@ def migrations(ctx: click.Context, prod: bool, *args, **kwargs) -> None:
 def run(prod: bool) -> None:
     env_file = ".env"
     if prod:
-        env_file = f"{env_file}.prod"
+        env_file = ".env.prod"
 
     load_dotenv(os.path.join(BASE_DIR, env_file))
     settings = config.get_settings()
@@ -116,9 +123,16 @@ def run(prod: bool) -> None:
     )
 )
 @click.pass_context
-def test(ctx: click.Context, *args, **kwargs) -> None:
+@click.option("--ci/--no-ci", default=False)
+def test(ctx: click.Context, ci: bool, *args, **kwargs) -> None:
+    ENV = "ENV=test"
+    if ci:
+        ENV = "ENV=ci"
+    os.system(f"{ENV} alembic upgrade head")
     ctx_args = " ".join(ctx.args)
-    exit(os.system(f"ENV=test pytest {ctx_args}"))
+    exit_status = os.system(f"{ENV} pytest {ctx_args}")
+    os.system(f"{ENV} alembic downgrade base")
+    exit(exit_status)
 
 
 cli.add_command(initapp)

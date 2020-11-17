@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     APPS: List[str] = ["testapp", "helloworld", "movies"]
     HOST: str
     PORT: int
-    SQLALCHEMY_DATABASE_URI: str = "sqlite:///test.db"
+    SQLALCHEMY_DATABASE_URI: str
     SENTRY_DNS: str
 
     CORS_ORIGIN_WHITELIST: List[str] = (
@@ -65,6 +65,13 @@ class TestSettings(Settings):
         case_sensitive = True
 
 
+class CiSettings(Settings):
+    class Config:
+        env_file = ".env.ci"
+        env_file_encoding = "utf-8"
+        case_sensitive = True
+
+
 @lru_cache()
 def get_settings():
     ENV = os.getenv("ENV", "dev")
@@ -72,4 +79,6 @@ def get_settings():
         return ProdSettings()
     if ENV == "test":
         return TestSettings()
+    if ENV == "ci":
+        return CiSettings()
     return Settings()

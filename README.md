@@ -22,3 +22,7 @@ python manage.py migrations revision --autogenerate -m "Autogenerate migrations"
 ```
 
 ## Deployment
+### Change enviromet variables
+```bash
+cp .env.dev .env && cp .env.dev .env.prod && cp .env.dev .env.test
+```
