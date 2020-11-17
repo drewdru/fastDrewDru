@@ -11,7 +11,7 @@ async def add_movie(payload: MovieIn):
 
 async def get_movies(query_filter=MovieQuery):
     db_service = get_db_service()
-    query = movies_query.query.select()
+    query = movies_query.select()
     # from sqlalchemy import over
     if query_filter.id:
         query = query.where(Movies.id == query_filter.id)
