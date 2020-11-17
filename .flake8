@@ -6,3 +6,4 @@ max_doc_length = 88
 statistics = True
 show_source = True
 count = True
+ignore = E501
