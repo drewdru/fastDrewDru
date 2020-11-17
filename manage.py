@@ -123,11 +123,15 @@ def run(prod: bool) -> None:
     )
 )
 @click.pass_context
-def test(ctx: click.Context, *args, **kwargs) -> None:
-    os.system("ENV=test alembic upgrade head")
+@click.option("--ci/--no-ci", default=False)
+def test(ctx: click.Context, ci: bool, *args, **kwargs) -> None:
+    ENV = "ENV=test"
+    if ci:
+        ENV = "ENV=ci"
+    os.system(f"{ENV} alembic upgrade head")
     ctx_args = " ".join(ctx.args)
-    exit_status = os.system(f"ENV=test pytest {ctx_args}")
-    os.system("ENV=test alembic downgrade base")
+    exit_status = os.system(f"{ENV} pytest {ctx_args}")
+    os.system(f"{ENV} alembic downgrade base")
     exit(exit_status)
 
 
