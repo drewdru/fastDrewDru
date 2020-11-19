@@ -89,10 +89,13 @@ def migrations(ctx: click.Context, prod: bool, *args, **kwargs) -> None:
 
 @click.command()
 @click.option("--prod/--no-prod", default=False)
-def run(prod: bool) -> None:
+@click.option("--docker/--no-docker", default=False)
+def run(prod: bool, docker: bool) -> None:
     env_file = ".env"
     if prod:
         env_file = ".env.prod"
+    if docker:
+        env_file = ".env.docker"
 
     load_dotenv(os.path.join(BASE_DIR, env_file))
     settings = config.get_settings()
@@ -123,11 +126,8 @@ def run(prod: bool) -> None:
     )
 )
 @click.pass_context
-@click.option("--ci/--no-ci", default=False)
-def test(ctx: click.Context, ci: bool, *args, **kwargs) -> None:
+def test(ctx: click.Context, *args, **kwargs) -> None:
     ENV = "ENV=test"
-    if ci:
-        ENV = "ENV=ci"
     os.system(f"{ENV} alembic upgrade head")
     ctx_args = " ".join(ctx.args)
     exit_status = os.system(f"{ENV} pytest {ctx_args}")

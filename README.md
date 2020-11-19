@@ -1,5 +1,37 @@
 # fastDrewDru
-backend for drewdru.com (https://github.com/drewdru/sitedrewdru)
+Backend for personal website(drewdru.com) and fun
+
+
+## Microservices
+Frontend repository: https://github.com/drewdru/sitedrewdru
+
+
+## Dependencies
+1. Python >= 3.8.0
+2. [requiremets.txt](requiremets.txt)
+3. PostgreSql
+4. Redis
+5. Nginx
+
+
+## Local Deployment
+### Configure project
+Create and configure .env file
+```bash
+cp .env.example .env && cp .env.example .env.test && cp .env.example .env.ci
+# if you use Docker: && cp .env.example .env.docker
+```
+### Build dependencies
+```bash
+virtualenv env -p python3
+source env/bin/activate
+pip install -r requirements.txt
+```
+### Migrate
+```bash
+python manage.py migrations upgrade head
+```
+
 
 ## Manage progect
 ### Run project
@@ -22,7 +54,23 @@ python manage.py migrations revision --autogenerate -m "Autogenerate migrations"
 ```
 
 ## Deployment
-### Change enviromet variables
+### Change enviromet variables in .env.prod
 ```bash
-cp .env.dev .env && cp .env.dev .env.prod && cp .env.dev .env.test
+cp .env.example .env.prod && cp .env.example .env.test
+```
+### Build dependencies
+```bash
+virtualenv env -p python3
+source env/bin/activate
+pip install -r requirements.txt
+```
+### Migrate
+```bash
+python manage.py migrations upgrade head
+```
+### Add and run systemd service
+```bash
+sudo cp etc/fastDrewDru.service /etc/systemd/system/fastDrewDru.service
+sudo systemctl daemon-reload
+sudo systemctl start fastDrewDru # use restart on deploy
 ```

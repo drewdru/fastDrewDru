@@ -72,13 +72,22 @@ class CiSettings(Settings):
         case_sensitive = True
 
 
+class DockerSettings(Settings):
+    class Config:
+        env_file = ".env.docker"
+        env_file_encoding = "utf-8"
+        case_sensitive = True
+
+
 @lru_cache()
 def get_settings():
     ENV = os.getenv("ENV", "dev")
     if ENV == "prod":
         return ProdSettings()
-    if ENV == "test":
+    elif ENV == "test":
         return TestSettings()
-    if ENV == "ci":
+    elif ENV == "ci":
         return CiSettings()
+    elif ENV == "docker":
+        return DockerSettings()
     return Settings()
