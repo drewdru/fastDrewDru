@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    working_dir: /app
+    command: ./run.sh docker
+    volumes:
+      - .:/app
+    ports:
+      - '8810:8810'
+    logging:
+      options:
+        max-size: "500k"
+        max-file: "10"
+    restart: always
+    links:
+      - db
+      - server
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+      POSTGRES_USER: user
+    # Set health checks to wait until postgres has started
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5433:5432
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+    restart: always
+
+  server:
+    image: nginx:alpine
+    ports:
+      - '8800:80'
+    volumes:
+      - .:/app
+      - ./etc/nginx/sites-enabled:/etc/nginx/sites-enabled
+    restart: always
+

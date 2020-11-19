@@ -1,0 +1,12 @@
+[Unit]
+Description=Backend for drewdru.com 
+After=network.target
+
+[Service]
+User=drewdru
+WorkingDirectory=/home/drewdru/develop/python/fastDrewDru
+ExecStart=/home/drewdru/develop/python/fastDrewDru/env/bin/python manage.py run --prod
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
