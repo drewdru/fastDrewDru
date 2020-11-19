@@ -9,7 +9,7 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     ENV: str
     DEBUG: bool = True
-    APPS: List[str] = ["testapp", "helloworld", "movies"]
+    APPS: List[str] = ["helloworld", "movies"]
     HOST: str
     PORT: int
     SQLALCHEMY_DATABASE_URI: str
