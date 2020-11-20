@@ -5,7 +5,7 @@ from databases import Database
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.engine import Engine
 
-from fastDrewDru import config
+from fastdrewdru import config
 
 
 @dataclass

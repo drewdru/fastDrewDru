@@ -4,10 +4,10 @@ from fastapi import APIRouter, Body, Path, Query
 
 from helloworld.schemas import Item
 
-helloworld = APIRouter()
+router = APIRouter()
 
 
-@helloworld.get(
+@router.get(
     "/",
     responses={
         200: {
@@ -20,7 +20,7 @@ async def read_root() -> dict:
     return {"Hello": "World"}
 
 
-@helloworld.get(
+@router.get(
     "/items/{item_id}",
     responses={
         200: {
@@ -40,7 +40,7 @@ async def read_item(
     return {"item_id": item_id, "q": q}
 
 
-@helloworld.put(
+@router.put(
     "/items/{item_id}",
     status_code=201,
     responses={

@@ -1,4 +1,4 @@
-from fastDrewDru.db import get_db_service
+from fastdrewdru.db import get_db_service
 from movies.models.movies import Movies, movies_query
 from movies.schemas import MovieIn, MovieQuery
 

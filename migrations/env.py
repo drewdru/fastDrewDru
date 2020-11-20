@@ -9,10 +9,10 @@ from sqlalchemy import engine_from_config, pool
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
-from fastDrewDru import config as app_config  # noqa
+from fastdrewdru import config as app_config  # noqa
 
 # imports after add BASE_DIR to sys.path
-from fastDrewDru.db import get_db_service  # noqa
+from fastdrewdru.db import get_db_service  # noqa
 
 ENV = os.getenv("ENV", "dev")
 env_file = ".env"

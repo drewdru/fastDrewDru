@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 logger = logging.getLogger(__name__)
 
-from fastDrewDru.db import get_db_service  # noqa
+from fastdrewdru.db import get_db_service  # noqa
 
 
 @pytest.fixture(autouse=True)

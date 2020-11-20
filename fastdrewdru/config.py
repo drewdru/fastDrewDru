@@ -9,6 +9,9 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     ENV: str
     DEBUG: bool = True
+    SECRET_KEY: str
+    SECRET_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES = 30
     APPS: List[str] = ["helloworld", "movies"]
     HOST: str
     PORT: int

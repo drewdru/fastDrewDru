@@ -7,16 +7,16 @@ from movies import crud
 from movies.schemas import MovieIn, MovieOut, MovieQuery
 
 logger = logging.getLogger(__name__)
-movies = APIRouter()
+router = APIRouter()
 
 
-@movies.get("/", status_code=status.HTTP_200_OK, response_model=List[MovieOut])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[MovieOut])
 async def get_movies(query_filter: MovieQuery = Depends(MovieQuery)) -> Response:
     """Get all movies"""
     return await crud.get_movies(query_filter)
 
 
-@movies.post("/", status_code=status.HTTP_201_CREATED, response_model=MovieOut)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=MovieOut)
 async def add_movie(
     payload: MovieIn = Body(
         None,
@@ -29,7 +29,7 @@ async def add_movie(
     return {"id": movie_id, **payload.dict()}
 
 
-@movies.patch("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.patch("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_movie(
     id: int = Path(None, title="Movie ID", description="Item Identifier"),
     payload: MovieIn = Body(
@@ -50,7 +50,7 @@ async def update_movie(
     return await crud.update_movie(id, updated_movie)
 
 
-@movies.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_movie(
     id: int = Path(None, title="Movie ID", description="Item Identifier")
 ) -> Response:
