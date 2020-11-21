@@ -1,7 +1,7 @@
 from sqlalchemy import ARRAY, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
-from fastDrewDru.db import get_db_service
+from fastdrewdru.db import get_db_service
 
 db_service = get_db_service()
 Base = declarative_base(bind=db_service.engine, metadata=db_service.metadata)

@@ -7,16 +7,16 @@ from movies import crud
 from movies.schemas import MovieIn, MovieOut, MovieQuery
 
 logger = logging.getLogger(__name__)
-movies = APIRouter()
+router = APIRouter()
 
 
-@movies.get("/", status_code=status.HTTP_200_OK, response_model=List[MovieOut])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[MovieOut])
 async def get_movies(query_filter: MovieQuery = Depends(MovieQuery)) -> Response:
     """Get all movies"""
     return await crud.get_movies(query_filter)
 
 
-@movies.post("/", status_code=status.HTTP_201_CREATED, response_model=MovieOut)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=MovieOut)
 async def add_movie(
     payload: MovieIn = Body(
         None,
@@ -29,7 +29,7 @@ async def add_movie(
     return {"id": movie_id, **payload.dict()}
 
 
-@movies.patch("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.patch("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_movie(
     id: int = Path(None, title="Movie ID", description="Item Identifier"),
     payload: MovieIn = Body(
@@ -47,10 +47,11 @@ async def update_movie(
     update_data = payload.dict(exclude_unset=True)
     movie_in_db = MovieIn(**movie)
     updated_movie = movie_in_db.copy(update=update_data)
-    return await crud.update_movie(id, updated_movie)
+    await crud.update_movie(id, updated_movie)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@movies.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_movie(
     id: int = Path(None, title="Movie ID", description="Item Identifier")
 ) -> Response:
@@ -60,4 +61,5 @@ async def delete_movie(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found"
         )
-    return await crud.delete_movie(id)
+    await crud.delete_movie(id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

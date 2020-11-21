@@ -10,7 +10,7 @@ class MovieIn(BaseModel):
     plot: str
     genres: List[str]
     casts: List[str]
-    test: str
+    test: str = None
 
 
 class MovieUpdate(MovieIn):

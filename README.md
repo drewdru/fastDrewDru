@@ -16,10 +16,14 @@ Frontend repository: https://github.com/drewdru/sitedrewdru
 
 ## Local Deployment
 ### Configure project
-Create and configure .env file
+Create and configure .env file:
 ```bash
 cp .env.example .env && cp .env.example .env.test && cp .env.example .env.ci
 # if you use Docker: && cp .env.example .env.docker
+```
+To get a string for SECRET_KEY run:
+```bash
+openssl rand -hex 32
 ```
 ### Build dependencies
 ```bash

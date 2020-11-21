@@ -2,7 +2,7 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from fastDrewDru.db import get_db_service
+from fastdrewdru.db import get_db_service
 from main import app
 from movies.models.movies import movies_query
 

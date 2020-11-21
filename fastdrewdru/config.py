@@ -9,7 +9,10 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     ENV: str
     DEBUG: bool = True
-    APPS: List[str] = ["testapp", "helloworld", "movies"]
+    SECRET_KEY: str
+    SECRET_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES = 30
+    APPS: List[str] = ["fastdrewdru", "helloworld", "movies"]
     HOST: str
     PORT: int
     SQLALCHEMY_DATABASE_URI: str

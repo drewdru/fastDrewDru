@@ -6,10 +6,10 @@ import massedit
 import uvicorn
 from dotenv import load_dotenv
 
-from fastDrewDru import config
+from fastdrewdru import config
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-project_name = "fastDrewDru"
+project_name = "fastdrewdru"
 
 
 @click.group()

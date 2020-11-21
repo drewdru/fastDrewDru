@@ -3,15 +3,15 @@ import logging.config
 import os
 import sys
 
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
-from fastDrewDru import config
-from fastDrewDru.db import get_db_service
-from helloworld.views import helloworld
+from fastdrewdru import config
+from fastdrewdru.db import get_db_service
+from fastdrewdru.views import router as fastdrewdru_router
+from helloworld.views import router as helloworld_router
 from middlewares import SentryMiddleware
-from movies.views import movies
+from movies.views import router as movies_router
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
@@ -19,21 +19,12 @@ logging.config.fileConfig("logging.conf", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 settings = config.get_settings()
 
+
 app = FastAPI(
     title="drewdru.com",
     description="REST API for drewdru.com",
     version=settings.version,
 )
-
-
-class IndexOut(BaseModel):
-    version: str
-
-
-@app.get("/", tags=["home"], status_code=status.HTTP_200_OK, response_model=IndexOut)
-async def index() -> Response:
-    print(app.routes)
-    return {"version": settings.version}
 
 
 @app.on_event("startup")
@@ -60,5 +51,6 @@ app.add_middleware(
 app.add_middleware(SentryMiddleware, dns=settings.SENTRY_DNS, traces_sample_rate=1.0)
 
 # Inittialize routers
-app.include_router(movies, prefix="/movies", tags=["movies"])
-app.include_router(helloworld, prefix="/helloworld", tags=["helloworld"])
+app.include_router(fastdrewdru_router)
+app.include_router(movies_router, prefix="/movies", tags=["movies"])
+app.include_router(helloworld_router, prefix="/helloworld", tags=["helloworld"])
