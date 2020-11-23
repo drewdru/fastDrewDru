@@ -7,7 +7,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastdrewdru import config
-from fastdrewdru.db import get_db_service
+
+# from fastdrewdru.db import get_db_service
 from fastdrewdru.views import router as fastdrewdru_router
 from helloworld.views import router as helloworld_router
 from middlewares import SentryMiddleware
@@ -27,16 +28,16 @@ app = FastAPI(
 )
 
 
-@app.on_event("startup")
-async def startup():
-    db_service = get_db_service()
-    await db_service.db.connect()
+# @app.on_event("startup")
+# async def startup():
+#     db_service = get_db_service()
+#     await db_service.db.connect()
 
 
-@app.on_event("shutdown")
-async def shutdown():
-    db_service = get_db_service()
-    await db_service.db.disconnect()
+# @app.on_event("shutdown")
+# async def shutdown():
+#     db_service = get_db_service()
+#     await db_service.db.disconnect()
 
 
 # Inittialize middlewares

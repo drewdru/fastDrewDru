@@ -2,7 +2,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Body, Path, Query
 
-from helloworld.schemas import Item
+from helloworld.schemas import ItemSchema
 
 router = APIRouter()
 
@@ -51,7 +51,7 @@ async def read_item(
 )
 async def update_item(
     item_id: int = Path(None, title="Item ID", description="Item Identifier"),
-    item: Item = Body(
+    item: ItemSchema = Body(
         None,
         title="Item",
         description="New Item Data",

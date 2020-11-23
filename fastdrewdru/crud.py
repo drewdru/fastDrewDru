@@ -1,9 +1,13 @@
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from fastdrewdru.db import get_db_service
-from fastdrewdru.models import User, user_query
+from fastdrewdru.models import UserModel
 
 
-async def get_user(username: str) -> User:
+async def get_user(username: str) -> UserModel:
     """Get user by username"""
     db_service = get_db_service()
-    query = user_query.select(user_query.c.username == username)
-    return await db_service.db.fetch_one(query=query)
+    async with AsyncSession(db_service.engine) as session:
+        result = await session.execute(select(UserModel).filter_by(username=username))
+        return result.scalars().first()

@@ -4,28 +4,31 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class IndexOut(BaseModel):
+class IndexOutSchema(BaseModel):
     version: str
 
 
-class Token(BaseModel):
+class TokenSchema(BaseModel):
     access_token: str
     token_type: str
 
 
-class TokenData(BaseModel):
+class TokenDataSchema(BaseModel):
     username: Optional[str] = None
 
 
-class User(BaseModel):
+class UserSchema(BaseModel):
     uid: uuid.UUID = None
     username: str = None
     email: Optional[str] = None
     full_name: Optional[str] = None
     is_active: bool = None
 
+    class Config:
+        orm_mode = True
 
-class UserInDB(User):
+
+class UserInDBSchema(UserSchema):
     password: str = None
 
     class Config:

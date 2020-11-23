@@ -72,9 +72,17 @@ pip install -r requirements.txt
 ```bash
 python manage.py migrations upgrade head
 ```
-### Add and run systemd service
+### Run systemd service
+Configure paths in etc/fastDrewDru.service
 ```bash
 sudo cp etc/fastDrewDru.service /etc/systemd/system/fastDrewDru.service
 sudo systemctl daemon-reload
-sudo systemctl start fastDrewDru # use restart on deploy
+sudo service fastDrewDru start # use restart on deploy
+```
+### Configure NGINX
+Configure paths in etc/nginx/sites-available/fastDrewDru.conf
+```bash
+sudo cp etc/nginx/sites-available/fastDrewDru.conf /etc/nginx/sites-available/fastDrewDru.conf
+sudo ln -s /etc/nginx/sites-available/fastDrewDru.conf /etc/nginx/sites-enabled/fastDrewDru.conf
+sudo service nginx reload
 ```

@@ -29,6 +29,9 @@ class MovieOut(MovieIn):
     casts: Optional[List[str]]
     test: Optional[str]
 
+    class Config:
+        orm_mode = True
+
 
 @dataclasses.dataclass
 class MovieQuery:
