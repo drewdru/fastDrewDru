@@ -48,7 +48,7 @@ python manage.py test
 ```
 ### Add new microservice
 ```bash
-python manage.py startapp microservice_name
+python manage.py createapp microservice_name
 ```
 ### Run migrations commands
 ```bash
@@ -77,7 +77,9 @@ Configure paths in etc/fastDrewDru.service
 ```bash
 sudo cp etc/fastDrewDru.service /etc/systemd/system/fastDrewDru.service
 sudo systemctl daemon-reload
-sudo service fastDrewDru start # use restart on deploy
+sudo systemctl start fastDrewDru.service
+sudo systemctl enable myfirst
+sudo service fastDrewDru status # use restart on deploy
 ```
 ### Configure NGINX
 Configure paths in etc/nginx/sites-available/fastDrewDru.conf

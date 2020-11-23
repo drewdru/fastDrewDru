@@ -19,7 +19,7 @@ def cli():
 
 @click.command()
 @click.argument("microservice_name")
-def initapp(microservice_name, prod):
+def createapp(microservice_name):
     try:
         Path(microservice_name).mkdir()
         with open(f"{microservice_name}/__init__.py", "w") as io_file:
@@ -97,7 +97,7 @@ def run(prod: bool, docker: bool) -> None:
     if docker:
         env_file = ".env.docker"
 
-    load_dotenv(os.path.join(BASE_DIR, env_file))
+    load_dotenv(env_file, override=True)
     settings = config.get_settings()
     if prod:
         uvicorn.run(
@@ -135,7 +135,7 @@ def test(ctx: click.Context, *args, **kwargs) -> None:
     exit(exit_status)
 
 
-cli.add_command(initapp)
+cli.add_command(createapp)
 cli.add_command(migrations)
 cli.add_command(run)
 cli.add_command(test)
