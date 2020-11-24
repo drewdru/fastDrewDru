@@ -78,7 +78,7 @@ Configure paths in etc/fastDrewDru.service
 sudo cp etc/fastDrewDru.service /etc/systemd/system/fastDrewDru.service
 sudo systemctl daemon-reload
 sudo systemctl start fastDrewDru.service
-sudo systemctl enable myfirst
+sudo systemctl enable fastDrewDru.service
 sudo service fastDrewDru status # use restart on deploy
 ```
 ### Configure NGINX

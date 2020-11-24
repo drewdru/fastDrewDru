@@ -6,10 +6,10 @@ from pydantic import BaseModel
 
 
 class MovieIn(BaseModel):
-    name: str
-    plot: str
-    genres: List[str]
-    casts: List[str]
+    name: str = None
+    plot: str = None
+    genres: List[str] = None
+    casts: List[str] = None
     test: str = None
 
 

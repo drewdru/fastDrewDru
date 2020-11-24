@@ -17,6 +17,6 @@ class DbService:
 @lru_cache()
 def get_db_service() -> DbService:
     settings = config.get_settings()
-    engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI)
+    engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI, echo=settings.DEBUG)
     metadata = MetaData()
     return DbService(metadata=metadata, engine=engine)
