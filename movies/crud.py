@@ -42,7 +42,7 @@ async def get_movies(query_filter: MovieQuery):
             filters_or.append(MoviesModel.test.like(f"%{query_filter.test}%"))
 
         result = await session.execute(
-            query.filter(and_(*filters_and, or_(*filters_or)))
+            query.filter(and_(*filters_and, or_(True, *filters_or)))
         )
         return result.scalars().all()
 
