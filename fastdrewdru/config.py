@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str
     SENTRY_DNS: str
 
+    LANGUAGES = ({"en": "English", "ru": "Russian"},)
+
     CORS_ORIGIN_WHITELIST: List[str] = (
         "http://localhost",
         "http://127.0.0.1",

@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Response, status
+from fastapi import APIRouter, Body, Depends, Path, Response, status
 
 from movies import crud
 from movies.schemas import MovieIn, MovieOut, MovieQuery
@@ -25,8 +25,8 @@ async def add_movie(
     )
 ) -> Response:
     """Add new movie"""
-    movie_id = await crud.add_movie(payload)
-    return {"id": movie_id, **payload.dict()}
+    id = await crud.add_movie(payload)
+    return {"id": id, **payload.dict(exclude_unset=True)}
 
 
 @router.patch("/{id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -39,15 +39,7 @@ async def update_movie(
     ),
 ) -> Response:
     """Update movie by id"""
-    movie = await crud.get_movie(id)
-    if not movie:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found"
-        )
-    update_data = payload.dict(exclude_unset=True)
-    movie_in_db = MovieIn(**movie)
-    updated_movie = movie_in_db.copy(update=update_data)
-    await crud.update_movie(id, updated_movie)
+    await crud.update_movie(id, payload)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -56,10 +48,5 @@ async def delete_movie(
     id: int = Path(None, title="Movie ID", description="Item Identifier")
 ) -> Response:
     """Delete movie by id"""
-    movie = await crud.get_movie(id)
-    if not movie:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found"
-        )
     await crud.delete_movie(id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

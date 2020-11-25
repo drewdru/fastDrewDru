@@ -7,6 +7,15 @@ User=drewdru
 WorkingDirectory=/home/drewdru/develop/python/fastDrewDru
 ExecStart=/home/drewdru/develop/python/fastDrewDru/env/bin/python manage.py run --prod
 Restart=always
-
+;;PROTECTION
+;ProtectSystem=true
+;ProtectHome=true
+;PrivateTmp=yes
+;CapabilityBoundingSet=~CAP_SYS_PTRACE
+;CapabilityBoundingSet=~CAP_SYS_RESOURCE
+;CapabilityBoundingSet=~CAP_SYS_ADMIN
+;SystemCallFilter=~@mount
+;InaccessibleDirectories=/path
+;ReadWritePaths=/home/drewdru/develop/python/fastDrewDru
 [Install]
 WantedBy=multi-user.target

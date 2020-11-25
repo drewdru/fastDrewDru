@@ -19,7 +19,7 @@ def cli():
 
 @click.command()
 @click.argument("microservice_name")
-def initapp(microservice_name, prod):
+def createapp(microservice_name):
     try:
         Path(microservice_name).mkdir()
         with open(f"{microservice_name}/__init__.py", "w") as io_file:
@@ -70,10 +70,13 @@ def initapp(microservice_name, prod):
 )
 @click.pass_context
 @click.option("--prod/--no-prod", default=False)
-def migrations(ctx: click.Context, prod: bool, *args, **kwargs) -> None:
+@click.option("--docker/--no-docker", default=False)
+def migrations(ctx: click.Context, prod: bool, docker: bool, *args, **kwargs) -> None:
     alembic_command = "alembic"
     if prod:
         alembic_command = "ENV=prod alembic"
+    elif docker:
+        alembic_command = "ENV=docker alembic"
 
     is_need_quotes = False
     for arg in ctx.args:
@@ -97,7 +100,7 @@ def run(prod: bool, docker: bool) -> None:
     if docker:
         env_file = ".env.docker"
 
-    load_dotenv(os.path.join(BASE_DIR, env_file))
+    load_dotenv(env_file, override=True)
     settings = config.get_settings()
     if prod:
         uvicorn.run(
@@ -135,7 +138,7 @@ def test(ctx: click.Context, *args, **kwargs) -> None:
     exit(exit_status)
 
 
-cli.add_command(initapp)
+cli.add_command(createapp)
 cli.add_command(migrations)
 cli.add_command(run)
 cli.add_command(test)
