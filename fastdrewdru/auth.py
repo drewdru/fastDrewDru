@@ -7,10 +7,10 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from fastdrewdru import config, crud
-from fastdrewdru.schemas import TokenData, User, UserInDB
+from fastdrewdru.schemas import TokenDataSchema, UserSchema
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 settings = config.get_settings()
 
 
@@ -24,18 +24,12 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-async def authenticate_user(username: str, password: str) -> Union[User, None]:
+async def authenticate_user(username: str, password: str) -> Union[UserSchema, None]:
     """Generate salted password hash"""
-    user_record = await crud.get_user(username)
-    if user_record is None:
+    user = await crud.get_user(username)
+    if user is None or not verify_password(password, user.password):
         return None
-
-    user = UserInDB(**user_record._row)
-    # TODO: user = UserInDB.from_orm(user_record)
-    if not verify_password(password, user.password):
-        return None
-    user = User(**user_record._row)
-    return user
+    return UserSchema.from_orm(user)
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -52,7 +46,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserSchema:
     """Get user by token"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -66,19 +60,19 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = TokenDataSchema(username=username)
     except JWTError:
         raise credentials_exception
     user_record = await crud.get_user(username=token_data.username)
     if user_record is None:
         raise credentials_exception
-    user = User(**user_record._row)
+    user = UserSchema(**user_record._row)
     return user
 
 
 async def get_current_active_user(
-    current_user: User = Depends(get_current_user),
-) -> User:
+    current_user: UserSchema = Depends(get_current_user),
+) -> UserSchema:
     """Get user by token if active"""
     if current_user.is_active:
         return current_user

@@ -19,7 +19,7 @@ env_file = ".env"
 if ENV != "dev":
     env_file = f"{env_file}.{ENV}"
 
-load_dotenv(os.path.join(BASE_DIR, env_file))
+load_dotenv(os.path.join(BASE_DIR, env_file), override=True)
 db_service = get_db_service()
 
 # this is the Alembic Config object, which provides

@@ -1,13 +1,14 @@
 import pytest
 from fastapi import status
 from httpx import AsyncClient
+from sqlalchemy import delete, insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastdrewdru.db import get_db_service
 from main import app
-from movies.models.movies import movies_query
+from movies.models.movies import MoviesModel
 
 MOVIE = {
-    "id": 1,
     "name": "test",
     "plot": "test",
     "genres": ["test"],
@@ -21,14 +22,20 @@ async def movies_fixture():
     """Connect to databse before tests."""
     # Setup : start db
     db_service = get_db_service()
-    query = movies_query.insert().values(MOVIE)
-    await db_service.db.execute(query=query)
+    movie_id = 0
+    async with AsyncSession(db_service.engine) as session:
+        query = insert(MoviesModel).values(**MOVIE)
+        result = await session.execute(query)
+        await session.commit()
+        movie_id = result.scalars().first()
 
     yield  # run tests
 
     # Teardown : stop db
-    query = movies_query.delete()
-    await db_service.db.execute(query=query)
+    async with AsyncSession(db_service.engine) as session:
+        query = delete(MoviesModel).where(MoviesModel.id == movie_id)
+        await session.execute(query)
+        await session.commit()
 
 
 @pytest.mark.asyncio
