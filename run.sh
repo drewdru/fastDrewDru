@@ -13,7 +13,7 @@ case $1 in
     python manage.py run --prod
     ;;
   docker)
-    python manage.py migrations upgrade head
-    python manage.py run
+    python manage.py migrations upgrade head --docker
+    python manage.py run --docker
     ;;
 esac

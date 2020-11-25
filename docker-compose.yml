@@ -26,7 +26,7 @@ services:
       POSTGRES_USER: user
     # Set health checks to wait until postgres has started
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U user -d postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,4 +44,40 @@ services:
       - .:/app
       - ./etc/nginx/sites-enabled:/etc/nginx/sites-enabled
     restart: always
-
+  # celery:
+  #   build: .
+  #   working_dir: /app
+  #   command: celery worker -A workers:celery --loglevel=info -B
+  #   depends_on:
+  #     - redis
+  #   environment:
+  #     SENTRY_DSN: ${SENTRY_DSN_CELERY}
+  #     PROJECT_DIR: ${PROJECT_DIR}
+  #   volumes:
+  #     - .:/app
+  #   logging:
+  #     options:
+  #       max-size: "500k"
+  #       max-file: "10"
+  #   restart: always
+  #   redis:
+  #     image: redis:latest
+  #     command: redis-server --appendonly yes --maxmemory 2048mb 
+  # #--slaveof no one
+  #    # environment:
+  #    #   - REDIS_REPLICATION_MODE=master
+  #     #privileged: true
+  #     sysctls:
+  #       - net.core.somaxconn=1024
+  #     #  - vm.overcommit_memory=1
+  #     volumes:
+  #       - ./redis.conf:/usr/local/etc/redis/redis.conf
+  #     restart: always
+  #   # flower:
+  #   #   image: mher/flower
+  #   #   command: ["flower", "--broker=redis://redis:6379/0", "--port=5555", "--url_prefix=flower"]
+  #   #   ports:
+  #   #     - "5555:5555"
+  #   #   environment:
+  #   #     - CELERY_BROKER_API=redis://redis:6379/0
+  #   #     - CELERY_BROKER_URL=redis://redis:6379/0

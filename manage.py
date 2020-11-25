@@ -70,10 +70,13 @@ def createapp(microservice_name):
 )
 @click.pass_context
 @click.option("--prod/--no-prod", default=False)
-def migrations(ctx: click.Context, prod: bool, *args, **kwargs) -> None:
+@click.option("--docker/--no-docker", default=False)
+def migrations(ctx: click.Context, prod: bool, docker: bool, *args, **kwargs) -> None:
     alembic_command = "alembic"
     if prod:
         alembic_command = "ENV=prod alembic"
+    elif docker:
+        alembic_command = "ENV=docker alembic"
 
     is_need_quotes = False
     for arg in ctx.args:

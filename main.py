@@ -27,13 +27,11 @@ app = FastAPI(
     version=settings.version,
 )
 
-
+# TODO: DEPRICATED
 # @app.on_event("startup")
 # async def startup():
 #     db_service = get_db_service()
 #     await db_service.db.connect()
-
-
 # @app.on_event("shutdown")
 # async def shutdown():
 #     db_service = get_db_service()
