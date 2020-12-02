@@ -1,0 +1,19 @@
+name: Deploy to prod on push to master
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: trigger single Job
+      uses: appleboy/jenkins-action@master
+      with:
+        url: ${{ secrets.JENKINS_URL }}
+        user: ${{ secrets.JENKINS_USER }}
+        token: ${{ secrets.JENKINS_TOKEN }}
+        job: "job_1,job_2"
