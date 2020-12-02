@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # region: Logs settings
     SENTRY_DNS: str
-    SENTRY_TRACES_SAMPLE_RATE: 1.0
+    SENTRY_TRACES_SAMPLE_RATE: float = 1.0
     # endregion
 
     # region: Constants

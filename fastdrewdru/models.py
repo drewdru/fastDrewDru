@@ -6,8 +6,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from fastdrewdru.db import get_db_service
 
-db_service = get_db_service()
-Base = declarative_base(bind=db_service.engine, metadata=db_service.metadata)
+db = get_db_service()
+Base = declarative_base(bind=db.engine, metadata=db.metadata)
 
 
 class UserModel(Base):

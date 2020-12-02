@@ -17,5 +17,6 @@ exclude = '''
   | dist
   | __pycache__
   | temp
+  | jenkins_home
 )/
 '''

@@ -6,6 +6,8 @@ import sys
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 from fastdrewdru import config
 from fastdrewdru.views import router as fastdrewdru_router
@@ -20,12 +22,12 @@ settings = config.get_settings()
 # region: Initialize logs
 logging.config.fileConfig("logging.conf", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
-sentry_logging = sentry_sdk.integrations.logging.LoggingIntegration(
+sentry_logging = LoggingIntegration(
     level=logging.WARNING,  # Capture info and above as breadcrumbs
     event_level=logging.ERROR,  # Send errors as events
 )
 sentry_sdk.init(
-    settings.sentry_dns,
+    settings.SENTRY_DNS,
     traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE,
     integrations=[sentry_logging],
 )
@@ -40,7 +42,7 @@ app = FastAPI(
 
 
 # region: Initialize middlewares
-app.add_middleware(sentry_sdk.integrations.asgi.SentryAsgiMiddleware)
+app.add_middleware(SentryAsgiMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGIN_WHITELIST,
