@@ -7,6 +7,7 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+    # region: App settings
     ENV: str
     DEBUG: bool = True
     SECRET_KEY: str
@@ -15,11 +16,23 @@ class Settings(BaseSettings):
     APPS: List[str] = ["fastdrewdru", "helloworld", "movies"]
     HOST: str
     PORT: int
+    # endregion
+
+    # region: Database settings
     SQLALCHEMY_DATABASE_URI: str
+    # endregion
+
+    # region: Logs settings
     SENTRY_DNS: str
+    SENTRY_TRACES_SAMPLE_RATE: 1.0
+    # endregion
 
+    # region: Constants
     LANGUAGES = ({"en": "English", "ru": "Russian"},)
+    ROWS_PER_PAGE = 10
+    # endregion
 
+    # region: CORS
     CORS_ORIGIN_WHITELIST: List[str] = (
         "http://localhost",
         "http://127.0.0.1",
@@ -34,6 +47,7 @@ class Settings(BaseSettings):
         r"|^http://\w+\.drewdru\.local$"
         r"|^http://\w+\.drewdru\.local:\d+$)"
     )
+    # endregion
 
     class Config:
         env_file = ".env"
