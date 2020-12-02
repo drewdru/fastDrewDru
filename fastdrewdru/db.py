@@ -9,7 +9,8 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from fastdrewdru.config import Settings, get_settings
 
 
-@dataclass  # TODO: use pydantic BaseSettings
+# TODO: use pydantic BaseSettings
+@dataclass
 class DbService:
     metadata: MetaData
     engine: Engine
