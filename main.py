@@ -3,22 +3,33 @@ import logging.config
 import os
 import sys
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastdrewdru import config
-
-# from fastdrewdru.db import get_db_service
 from fastdrewdru.views import router as fastdrewdru_router
 from helloworld.views import router as helloworld_router
-from middlewares import SentryMiddleware
 from movies.views import router as movies_router
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
+settings = config.get_settings()
+
+
+# region: Initialize logs
 logging.config.fileConfig("logging.conf", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
-settings = config.get_settings()
+sentry_logging = sentry_sdk.integrations.logging.LoggingIntegration(
+    level=logging.WARNING,  # Capture info and above as breadcrumbs
+    event_level=logging.ERROR,  # Send errors as events
+)
+sentry_sdk.init(
+    settings.sentry_dns,
+    traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE,
+    integrations=[sentry_logging],
+)
+# endregion
 
 
 app = FastAPI(
@@ -27,18 +38,9 @@ app = FastAPI(
     version=settings.version,
 )
 
-# TODO: DEPRICATED
-# @app.on_event("startup")
-# async def startup():
-#     db_service = get_db_service()
-#     await db_service.db.connect()
-# @app.on_event("shutdown")
-# async def shutdown():
-#     db_service = get_db_service()
-#     await db_service.db.disconnect()
 
-
-# Inittialize middlewares
+# region: Initialize middlewares
+app.add_middleware(sentry_sdk.integrations.asgi.SentryAsgiMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGIN_WHITELIST,
@@ -47,9 +49,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(SentryMiddleware, dns=settings.SENTRY_DNS, traces_sample_rate=1.0)
+# endregion
 
-# Inittialize routers
+
+# region: Initialize routers
 app.include_router(fastdrewdru_router)
 app.include_router(movies_router, prefix="/movies", tags=["movies"])
 app.include_router(helloworld_router, prefix="/helloworld", tags=["helloworld"])
+# endregion
