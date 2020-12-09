@@ -18,3 +18,14 @@ class CredentialsException(HttpException):
     status_code = status.HTTP_401_UNAUTHORIZED
     detail = "Could not validate credentials"
     headers = {"WWW-Authenticate": "Bearer"}
+
+
+class IncorrectCredentialsException(HttpException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Incorrect username or password"
+    headers = {"WWW-Authenticate": "Bearer"}
+
+
+class InactiveUserException(HttpException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = "Inactive user"

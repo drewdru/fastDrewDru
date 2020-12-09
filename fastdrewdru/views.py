@@ -1,11 +1,12 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, Response, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastdrewdru import auth, crud
 from fastdrewdru.config import Settings, get_settings
+from fastdrewdru.exceptions import IncorrectCredentialsException
 from fastdrewdru.schemas import IndexOutSchema, TokenSchema, UserSchema
 from fastdrewdru.utils import get_session
 
@@ -30,11 +31,7 @@ async def login(
 ):
     """Login to get access token"""
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise IncorrectCredentialsException
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth.create_access_token(
         data={"sub": user.username},

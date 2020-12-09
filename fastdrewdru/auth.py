@@ -1,14 +1,14 @@
 from datetime import datetime, timedelta
 from typing import Optional, Union
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastdrewdru import crud
-from fastdrewdru.exceptions import CredentialsException
+from fastdrewdru.exceptions import CredentialsException, InactiveUserException
 from fastdrewdru.schemas import UserSchema
 from fastdrewdru.utils import get_session
 
@@ -69,4 +69,4 @@ async def get_current_active_user(
     """Get user by token if active"""
     if current_user.is_active:
         return current_user
-    raise HTTPException(status_code=400, detail="Inactive user")
+    raise InactiveUserException
