@@ -1,13 +1,11 @@
 from sqlalchemy import ARRAY, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 
 from fastdrewdru.db import get_db_service
 
-db_service = get_db_service()
-Base = declarative_base(bind=db_service.engine, metadata=db_service.metadata)
+db = get_db_service()
 
 
-class MoviesModel(Base):
+class MoviesModel(db.Model):
     __tablename__ = "movies"
 
     id = Column(Integer, primary_key=True, index=True, unique=True)

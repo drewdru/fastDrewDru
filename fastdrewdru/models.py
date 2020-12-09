@@ -2,15 +2,13 @@ import uuid
 
 from sqlalchemy import BigInteger, Boolean, Column, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.declarative import declarative_base
 
 from fastdrewdru.db import get_db_service
 
 db = get_db_service()
-Base = declarative_base(bind=db.engine, metadata=db.metadata)
 
 
-class UserModel(Base):
+class UserModel(db.Model):
     __tablename__ = "user"
 
     # user personal info

@@ -20,7 +20,7 @@ if ENV != "dev":
     env_file = f"{env_file}.{ENV}"
 
 load_dotenv(os.path.join(BASE_DIR, env_file), override=True)
-db_service = get_db_service()
+db = get_db_service()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -41,7 +41,7 @@ for app in settings.APPS:
         exec(f"from {app}.models import *")
     except ModuleNotFoundError:
         continue
-target_metadata = db_service.metadata
+target_metadata = db.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
