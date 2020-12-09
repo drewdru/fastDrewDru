@@ -48,6 +48,5 @@ def get_paginator(
 
 
 async def get_session(db: DbService = Depends(get_db_service)):
-    # TODO: Use one session per request
     async with AsyncSession(db.engine, expire_on_commit=False) as session:
         yield session
