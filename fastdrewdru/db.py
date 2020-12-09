@@ -15,6 +15,7 @@ class DbService:
     engine: Engine
 
 
+# TODO: Use Dependes injections for engine. import metadata?
 @lru_cache()
 def get_db_service() -> DbService:
     settings = get_settings()

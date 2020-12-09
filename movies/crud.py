@@ -3,6 +3,7 @@ from sqlalchemy import and_, delete, insert, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastdrewdru.db import get_db_service
+from fastdrewdru.utils import Paginator
 from movies.models.movies import MoviesModel
 from movies.schemas import MovieIn, MovieQuery
 
@@ -20,9 +21,8 @@ async def add_movie(payload: MovieIn):
         return result.scalars().first()
 
 
-async def get_movies(query_filter: MovieQuery):
+async def get_movies(query_filter: MovieQuery, paginator: Paginator = None):
     db_service = get_db_service()
-    # TODO: Add PAGINATION use sqlalchemy.over
     async with AsyncSession(db_service.engine) as session:
         query = select(MoviesModel)
         # or just: .filter_by(**query_filter.dict(exclude_unset=True))

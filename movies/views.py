@@ -3,6 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, Body, Depends, Path, Response, status
 
+from fastdrewdru.utils import Paginator, get_paginator
 from movies import crud
 from movies.schemas import MovieIn, MovieOut, MovieQuery
 
@@ -11,7 +12,10 @@ router = APIRouter()
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[MovieOut])
-async def get_movies(query_filter: MovieQuery = Depends(MovieQuery)) -> Response:
+async def get_movies(
+    query_filter: MovieQuery = Depends(MovieQuery),
+    paginator: Paginator = Depends(get_paginator),
+) -> Response:
     """Get all movies"""
     return await crud.get_movies(query_filter)
 
