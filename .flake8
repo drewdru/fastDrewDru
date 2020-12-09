@@ -1,5 +1,5 @@
 [flake8]
-exclude = .git,__pycache__,temp,old,build,dist,env,venv
+exclude = .git,__pycache__,temp,old,build,dist,env,venv,jenkins_home
 max_complexity = 18
 max_line_length = 88
 max_doc_length = 88

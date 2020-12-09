@@ -1,17 +1,18 @@
 from datetime import datetime, timedelta
 from typing import Optional, Union
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordRequestForm
+from jose import jwt
 from passlib.context import CryptContext
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from fastdrewdru import config, crud
-from fastdrewdru.schemas import TokenDataSchema, UserSchema
+from fastdrewdru import crud
+from fastdrewdru.exceptions import CredentialsException, InactiveUserException
+from fastdrewdru.schemas import UserSchema
+from fastdrewdru.utils import get_session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-settings = config.get_settings()
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -24,15 +25,22 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-async def authenticate_user(username: str, password: str) -> Union[UserSchema, None]:
+async def authenticate_user(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    user: crud.UserModel = Depends(crud.get_user_by_form),
+) -> Union[UserSchema, None]:
     """Generate salted password hash"""
-    user = await crud.get_user(username)
-    if user is None or not verify_password(password, user.password):
+    if user is None or not verify_password(form_data.password, user.password):
         return None
     return UserSchema.from_orm(user)
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(
+    data: dict,
+    secret_key: str,
+    secret_algorithm: str,
+    expires_delta: Optional[timedelta] = None,
+) -> str:
     """Generate access token"""
     to_encode = data.copy()
     if expires_delta:
@@ -40,40 +48,25 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.SECRET_ALGORITHM
-    )
+    encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=secret_algorithm)
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserSchema:
+async def get_current_user(
+    session: AsyncSession = Depends(get_session),
+    user: crud.UserModel = Depends(crud.get_user_by_jwt),
+) -> UserSchema:
     """Get user by token"""
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.SECRET_ALGORITHM]
-        )
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenDataSchema(username=username)
-    except JWTError:
-        raise credentials_exception
-    user_record = await crud.get_user(username=token_data.username)
-    if user_record is None:
-        raise credentials_exception
-    user = UserSchema(**user_record._row)
-    return user
+    if user is None:
+        raise CredentialsException
+    return UserSchema.from_orm(user)
 
 
 async def get_current_active_user(
+    session: AsyncSession = Depends(get_session),
     current_user: UserSchema = Depends(get_current_user),
 ) -> UserSchema:
     """Get user by token if active"""
     if current_user.is_active:
         return current_user
-    raise HTTPException(status_code=400, detail="Inactive user")
+    raise InactiveUserException

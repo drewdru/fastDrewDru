@@ -102,6 +102,7 @@ def run(prod: bool, docker: bool) -> None:
 
     load_dotenv(env_file, override=True)
     settings = config.get_settings()
+    # cli.add_command(uvicorn.main, name="uvicorn")
     if prod:
         uvicorn.run(
             "main:app",

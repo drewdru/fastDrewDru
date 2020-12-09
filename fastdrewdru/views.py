@@ -1,45 +1,50 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, Response, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from fastdrewdru import auth, config
+from fastdrewdru import auth, crud
+from fastdrewdru.config import Settings, get_settings
+from fastdrewdru.exceptions import IncorrectCredentialsException
 from fastdrewdru.schemas import IndexOutSchema, TokenSchema, UserSchema
+from fastdrewdru.utils import get_session
 
 router = APIRouter()
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
-settings = config.get_settings()
 
 
 @router.get(
     "/", status_code=status.HTTP_200_OK, response_model=IndexOutSchema, tags=["main"]
 )
-async def index() -> Response:
+async def index(settings: Settings = Depends(get_settings)) -> Response:
     """Get app version"""
     return {"version": settings.version}
 
 
 @router.post("/login", response_model=TokenSchema, tags=["auth"])
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(
+    session: AsyncSession = Depends(get_session),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    user: crud.UserModel = Depends(auth.authenticate_user),
+    settings: Settings = Depends(get_settings),
+):
     """Login to get access token"""
-    user = await auth.authenticate_user(form_data.username, form_data.password)
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise IncorrectCredentialsException
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth.create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.username},
+        expires_delta=access_token_expires,
+        secret_key=settings.SECRET_KEY,
+        secret_algorithm=settings.SECRET_ALGORITHM,
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.get("/users/me/", response_model=UserSchema, tags=["user"])
 async def read_users_me(
+    session: AsyncSession = Depends(get_session),
     current_user: UserSchema = Depends(auth.get_current_active_user),
 ):
     """Get user data"""

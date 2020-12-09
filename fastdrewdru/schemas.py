@@ -13,7 +13,7 @@ class TokenSchema(BaseModel):
     token_type: str
 
 
-class TokenDataSchema(BaseModel):
+class JwtSchema(BaseModel):
     username: Optional[str] = None
 
 

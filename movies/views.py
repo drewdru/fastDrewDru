@@ -1,19 +1,22 @@
 import logging
 from typing import List
 
-from fastapi import APIRouter, Body, Depends, Path, Response, status
+from fastapi import APIRouter, Body, Depends, Response, status
 
 from movies import crud
-from movies.schemas import MovieIn, MovieOut, MovieQuery
+from movies.models.movies import MoviesModel
+from movies.schemas import MovieIn, MovieOut
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[MovieOut])
-async def get_movies(query_filter: MovieQuery = Depends(MovieQuery)) -> Response:
+async def get_movies(
+    movies: MoviesModel = Depends(crud.get_movies),
+) -> Response:
     """Get all movies"""
-    return await crud.get_movies(query_filter)
+    return movies
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=MovieOut)
@@ -22,31 +25,20 @@ async def add_movie(
         None,
         title="Movie data",
         description="New Movie Data",
-    )
+    ),
+    movie_id: int = Depends(crud.add_movie),
 ) -> Response:
     """Add new movie"""
-    id = await crud.add_movie(payload)
-    return {"id": id, **payload.dict(exclude_unset=True)}
+    return {"id": movie_id, **payload.dict(exclude_unset=True)}
 
 
 @router.patch("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_movie(
-    id: int = Path(None, title="Movie ID", description="Item Identifier"),
-    payload: MovieIn = Body(
-        None,
-        title="Movie data",
-        description="New Movie Data",
-    ),
-) -> Response:
+async def update_movie(result=Depends(crud.update_movie)) -> Response:
     """Update movie by id"""
-    await crud.update_movie(id, payload)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_movie(
-    id: int = Path(None, title="Movie ID", description="Item Identifier")
-) -> Response:
+async def delete_movie(result=Depends(crud.delete_movie)) -> Response:
     """Delete movie by id"""
-    await crud.delete_movie(id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
