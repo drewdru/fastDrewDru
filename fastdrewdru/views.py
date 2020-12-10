@@ -22,6 +22,14 @@ async def index(settings: Settings = Depends(get_settings)) -> Response:
     return {"version": settings.version}
 
 
+@router.get(
+    "/", status_code=status.HTTP_200_OK, response_model=IndexOutSchema, tags=["main"]
+)
+async def health_check(settings: Settings = Depends(get_settings)) -> Response:
+    """Get app version"""
+    return {"version": settings.version}
+
+
 @router.post("/login", response_model=TokenSchema, tags=["auth"])
 async def login(
     session: AsyncSession = Depends(get_session),
