@@ -1,20 +1,17 @@
-from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
 
+from pydantic import BaseModel
 from sqlalchemy import MetaData
-from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 from fastdrewdru import config
 
 
-# TODO: use pydantic BaseSettings
-@dataclass
-class DbService:
-    metadata: MetaData
-    engine: Engine
+class DbService(BaseModel):
+    metadata: Any
+    engine: Any
     Model: Any
 
 
